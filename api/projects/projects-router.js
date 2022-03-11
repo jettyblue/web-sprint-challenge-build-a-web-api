@@ -7,36 +7,56 @@ const { validateProjectId, validateProject } = require('./projects-middleware');
 router.get('/', (req, res, next) => {
     Project.get()
         .then(projects => {
-            res.json(projects);
+            if(!projects) {
+                res.status(200).json([]);
+            } else {
+                res.status(200).json(projects);
+            }
         })
         .catch(next);
 })
 
 router.get('/:id', validateProjectId, (req, res, next) => {
-    Project.get(req.params.id)
-        .then(project => {
-            if(!project) {
-                res.status(404).json({ message: 'not found' });
-            }
-            res.json(project);
-        })
-        .catch(next);
+    res.json(req.project);
 })
 
 router.post('/', validateProject, (req, res, next) => {
-    Project.insert({ name: req.name, description: req.description })
+    Project.insert(req.body)
         .then(newProject => {
             res.status(201).json(newProject);
         })
         .catch(next);
 })
 
-router.put('/:id', validateProjectId, validateProject, (req, res, next) => {
-    Project.update(req.params.id, req.body)
-        .then(updatedProject => {
-            res.status(200).json(updatedProject);
-        })
-        .catch(next);
+router.put('/:id', (req, res, next) => {
+    const { id } = req.params;
+    const { name, description, completed } = req.body;
+
+    if(!name || !description || completed === undefined) {
+        res.status(400).json({ message: 'missing required fields' });
+    } else {
+        Project.get(id)
+            .then(project => {
+                if(!project) {
+                    res.status(404).json({ message: 'project does not exist'});
+                } else {
+                    return Project.update(req.params.id, req.body);
+                }
+            })
+            .then(data => {
+                if(data) {
+                    return Project.get(req.params.id);
+                }
+            })
+            .then(project => {
+                if(project) {
+                    res.status(200).json(project);
+                }
+            })
+            .catch(err => {
+                res.status(500).json({ message: 'project could not be updated'});
+            })
+    }
 })
 
 router.delete('/:id', validateProjectId, (req, res, next) => {
@@ -47,7 +67,7 @@ router.delete('/:id', validateProjectId, (req, res, next) => {
         .catch(next);
 })
 
-router.get('/:id/actions', validateProjectId, (req, res, next) => {
+router.get('/:id/actions', (req, res, next) => {
     Project.getProjectActions(req.params.id)
         .then(actions => {
             if(!actions) {

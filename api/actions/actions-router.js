@@ -3,12 +3,15 @@ const express = require('express');
 const router = express.Router();
 const Action = require('./actions-model');
 const { validateActionId, validateAction } = require('./actions-middlware');
-const { validateProjectId } = require('../projects/projects-middleware');
 
 router.get('/', (req, res, next) => {
     Action.get()
         .then(actions => {
+            if(!actions) {
+                res.status(200).json([]);
+            } else {
             res.json(actions);
+            }
         })
         .catch(next);
 })
@@ -24,24 +27,35 @@ router.get('/:id', (req, res, next) => {
         .catch(next);
 })
 
-router.post('/', validateProjectId, validateAction, (req, res, next) => {
+router.post('/', validateAction, (req, res, next) => {
     Action.insert(req.body)
-        .then(({ id }) => {
-            return Action.findById(id);
-        })
         .then(newAction => {
             res.status(201).json(newAction);
         })
         .catch(next);
 })
 
-router.put('/:id', validateActionId, validateAction, (req, res, next) => {
-    Action.update(req.params.id, req.body)
-        .then(updatedAction => {
-            res.status(200).json(updatedAction);
-        })
-        .catch(next);
+router.put('/:id', (req, res, next) => {
+    const { notes, description, completed, project_id } = req.body;
+
+    if(!notes || !description || completed === undefined || !project_id) {
+        res.status(400).json({ message: 'missing required fields'});
+    } else {
+        Action.update(req.params.id, req.body)
+            .then(updatedAction => {
+                res.status(200).json(updatedAction);
+            })
+            .catch(next);
+    }
 })
+
+// } else 
+//     Action.update(req.params.id, req.body)
+//         .then(updatedAction => {
+//             res.status(200).json(updatedAction);
+//         })
+//         .catch(next);
+
 
 router.delete('/:id', validateActionId, (req, res, next) => {
     Action.remove(req.params.id)
