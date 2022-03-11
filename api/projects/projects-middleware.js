@@ -8,7 +8,7 @@ async function validateProjectId(req, res, next) {
         if(!project) {
             res.status(404).json({ message: 'project not found' });
         } else {
-            req.validateProjectId = project;
+            req.project = project;
             next();
         }
     }
@@ -21,7 +21,7 @@ async function validateProjectId(req, res, next) {
 function validateProject(req, res, next) {
     const { name, description } = req.body;
     if(!name || !description || !name.trim() || !description.trim()) {
-        res.status(400).json({ message: 'must include a name or description' });
+        res.status(400).json({ message: 'missing required fields' });
     } else {
         req.name = name.trim();
         req.description = description.trim();

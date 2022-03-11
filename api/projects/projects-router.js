@@ -15,6 +15,9 @@ router.get('/', (req, res, next) => {
 router.get('/:id', validateProjectId, (req, res, next) => {
     Project.get(req.params.id)
         .then(project => {
+            if(!project) {
+                res.status(404).json({ message: 'not found' });
+            }
             res.json(project);
         })
         .catch(next);
@@ -47,17 +50,16 @@ router.delete('/:id', validateProjectId, (req, res, next) => {
 router.get('/:id/actions', validateProjectId, (req, res, next) => {
     Project.getProjectActions(req.params.id)
         .then(actions => {
+            if(!actions) {
+                res.status(404).json({ message: 'not found' });
+            }
             res.status(200).json(actions);
         })
         .catch(next);
 })
 
 router.use((err, req, res, next) => {
-    res.status(err.status || 500).json({
-        customError: 'uh oh, something went wrong',
-        message: err.message,
-        stack: err.stack
-    })
+    res.status(err.status || 500).json({ message: err.message });
 })
 
 module.exports = router;
