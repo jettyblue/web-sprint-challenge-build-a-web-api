@@ -1,20 +1,16 @@
 const express = require('express');
 const server = express();
-const cors = require('cors');
-// const { logger } = require('./actions/actions-middlware');
 
 const projectsRouter = require('./projects/projects-router');
 const actionsRouter = require('./actions/actions-router');
 
 server.use(express.json());
-// server.use(logger);
-server.use(cors());
 
 server.use('/api/projects', projectsRouter);
 server.use('/api/actions', actionsRouter);
 
 server.get('/', (req, res) => {
-    res.send(`<h2>Hello there, I'm middleware</h2>`)
+    res.send(`<h2>Why helloooo!</h2>`)
 })
 
 // Configure your server here

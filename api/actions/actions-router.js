@@ -49,14 +49,6 @@ router.put('/:id', (req, res, next) => {
     }
 })
 
-// } else 
-//     Action.update(req.params.id, req.body)
-//         .then(updatedAction => {
-//             res.status(200).json(updatedAction);
-//         })
-//         .catch(next);
-
-
 router.delete('/:id', validateActionId, (req, res, next) => {
     Action.remove(req.params.id)
         .then(deleted => {

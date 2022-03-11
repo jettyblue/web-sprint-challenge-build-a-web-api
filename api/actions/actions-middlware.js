@@ -33,5 +33,4 @@ function validateAction(req, res, next) {
 module.exports = {
     validateActionId,
     validateAction,
-    // logger
 }

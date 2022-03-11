@@ -11,20 +11,17 @@ there is no data on that route, just write some code, you'll sort it out… don'
 I need this code, but don't know where, perhaps should make some middleware, don't worry, just hack it
 
 Pull your server into this file and start it!
+
+******* GABE IS A LEGIT GENIUS!!! *******
 */
 
 require('dotenv').config();
 
 const server = require('./api/server');
-// const express = require('express');
-// const cors = require('cors');
-
+const express = require('express');
 const PORT = process.env.PORT || 9000;
 
-server.use(express.json());
-server.use(cors());
-
-server.get('/api/hello', (req, res) => {
+server.get('/', (req, res) => {
     res.json({ message: 'api is working' });
 })
 
